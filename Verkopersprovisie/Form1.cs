@@ -165,13 +165,11 @@ namespace Verkopersprovisie
 
         private void ButtonCalculate_Click(object sender, EventArgs e)
         {
-            ButtonReset_Click(buttonReset, EventArgs.Empty);
             List<string>chairs = new List<string>();
             List<string>sofas = new List<string>();
-            numericUpDownAmount.Value = 1;
+            tempEmployee.Extra = 0;
             int level;
             bool level1 = false;
-            bool level2 = false;
             string tempString = "";
             string date = "";
             string name = "";
@@ -210,7 +208,6 @@ namespace Verkopersprovisie
                     indexEnd = tempString.IndexOf("Amount:")-2;
                     lenght = indexEnd - indexStart;
                     price = Convert.ToDouble(tempString.Substring(indexStart, lenght));
-
                     
                     if (months == 1)
                     {
@@ -249,7 +246,6 @@ namespace Verkopersprovisie
                 // Checks which level unitsperyear is in and check which calculations must be made
                 if (unitsPerYear > 20001)
                 {
-                    level2 = true;
                     level1 = true;
                     level = 20000;
 
@@ -259,12 +255,12 @@ namespace Verkopersprovisie
                     tempEmployee.Extra += difference;
                 }
 
-                if (unitsPerYear < 20000 && unitsPerYear >= 10001 || level2)
+                if (unitsPerYear < 20000 && unitsPerYear >= 10001 || level1)
                 {
                     level1 = true;
                     level = 10000;
 
-                    if (level2)
+                    if (level1)
                     {
                         difference = (20001 - level);
                         difference = Math.Floor(difference / 1000);
@@ -302,7 +298,7 @@ namespace Verkopersprovisie
                     tempEmployee.Extra = 1.50;
                 }
 
-                tempEmployee.Commission += (_revenue * 0.03 + 4 * (chairsPerMonth + sofasPerMonth))* tempEmployee.Extra;
+                tempEmployee.Commission = (_revenue * 0.03 + 4 * (chairsPerMonth + sofasPerMonth))* tempEmployee.Extra;
 
                 labelTicketsTotal.Text = $@"(revenue {_revenue}* 3% + € 4 * units sold {unitsPerYear}) * extra {(tempEmployee.Extra-1)*100}%";
                 labelPriceTotal.Text = $@"Totaal: € {Math.Round(tempEmployee.Commission, 2):0.00},-";
@@ -316,6 +312,9 @@ namespace Verkopersprovisie
 
         private void ButtonReset_Click(object sender, EventArgs e)
         {
+            numericUpDownAmount.Value = 1;
+            listBoxSold.DataSource = null;
+
             // Fills numericupdowns
             foreach (NumericUpDown control in panelYear.Controls)
             {
@@ -350,6 +349,9 @@ namespace Verkopersprovisie
                 entry.Value.SaleDate = Convert.ToDateTime($"1/1/1");
                 entry.Value.ProductNumber = "";
             }
+
+            labelTicketsTotal.Text = $@"(revenue {0}* 3% + € 4 * units sold {0}) * extra {0}%";
+            labelPriceTotal.Text = $@"Totaal: € {Math.Round(tempEmployee.Commission, 2):0.00},-";
         }
 
         private bool ValidateDate(int day, int month, int year)
